@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WOD Rehab</title>
+
+<!-- iOS home-screen web-app -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="WOD Rehab">
+<meta name="theme-color" content="#ECEEF1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<style>
+  :root{
+    --bg:#ECEEF1;
+    --surface:#FFFFFF;
+    --ink:#1E2228;
+    --muted:#6B7280;
+    --line:#DCE0E5;
+    --flame:#D85A2E;
+    --flame-soft:#F6E1D6;
+    --steel:#35618A;
+    --steel-soft:#DCE6EF;
+    --radius:14px;
+    --display:-apple-system,BlinkMacSystemFont,"Helvetica Neue",system-ui,sans-serif;
+    --body:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:var(--body); line-height:1.5; -webkit-font-smoothing:antialiased;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .wrap{max-width:720px; margin:0 auto; padding:24px 18px 60px}
+
+  .eyebrow{font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--flame); font-weight:700; margin:0 0 6px}
+  h1{font-family:var(--display); font-weight:800; font-size:31px; line-height:1.04; margin:0 0 4px; letter-spacing:-.02em}
+  .sub{color:var(--muted); font-size:14.5px; margin:0}
+  .anchor{margin:9px 0 0; font-size:12.5px; color:var(--flame); font-weight:700}
+
+  .ridge-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px 12px; margin:18px 0 22px}
+  .ridge-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px}
+  .ridge-head .pct{font-family:var(--display); font-weight:800; font-size:22px}
+  .ridge-head .lbl{font-size:12px; letter-spacing:.05em; color:var(--muted); text-transform:uppercase}
+  svg.ridge{display:block; width:100%; height:92px}
+
+  .stage{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); margin:0 0 16px; overflow:hidden}
+  .stage.done{border-color:var(--flame)}
+  .stage-top{display:flex; gap:13px; align-items:flex-start; padding:16px 18px 12px}
+  .marker{flex:0 0 auto; width:34px; height:34px; border-radius:9px; background:var(--steel-soft); color:var(--steel); display:flex; align-items:center; justify-content:center; font-family:var(--display); font-weight:800; font-size:16px; border:1px solid #C7D6E4}
+  .stage.done .marker{background:var(--flame); color:#fff; border-color:var(--flame)}
+  .stage-head{flex:1 1 auto; min-width:0}
+  .stage-window{font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:700}
+  .stage-title{font-family:var(--display); font-weight:700; font-size:19px; margin:1px 0 4px; letter-spacing:-.01em}
+  .date-badge{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--steel); background:var(--steel-soft); border:1px solid #C7D6E4; border-radius:999px; padding:3px 10px; margin-bottom:5px}
+  .stage.done .date-badge{color:var(--flame); background:var(--flame-soft); border-color:#EAC7B6}
+  .stage-intent{font-size:13.5px; color:var(--muted); margin:0}
+  .stage-count{flex:0 0 auto; font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; padding-top:3px; white-space:nowrap}
+
+  .group-label{font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--flame); font-weight:700; padding:4px 18px 2px}
+
+  ul{list-style:none; margin:0; padding:2px 12px 8px}
+  li.task{display:flex; gap:11px; align-items:flex-start; padding:9px 6px; border-radius:9px; cursor:pointer; -webkit-tap-highlight-color:transparent; user-select:none}
+  li.task:active{background:#F1F4F7}
+  .box{flex:0 0 auto; width:21px; height:21px; margin-top:1px; border-radius:6px; border:1.8px solid #B9C2CD; background:#fff; position:relative}
+  li.task.checked .box{background:var(--flame); border-color:var(--flame)}
+  .box svg{position:absolute; inset:0; width:100%; height:100%; opacity:0}
+  li.task.checked .box svg{opacity:1}
+  .task-text{font-size:14.5px; padding-top:1px}
+  li.task.checked .task-text{color:var(--muted); text-decoration:line-through; text-decoration-color:#B9C2CD}
+
+  li.habit{display:flex; gap:11px; align-items:center; padding:9px 6px; border-radius:9px; flex-wrap:wrap}
+  .habit-text{font-size:14.5px; flex:1 1 200px; min-width:170px}
+  .dots{display:flex; gap:7px; flex:0 0 auto}
+  .dot{display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; -webkit-tap-highlight-color:transparent}
+  .dot-circle{width:28px; height:28px; border-radius:50%; border:1.8px solid #B9C2CD; background:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--muted)}
+  .dot.on .dot-circle{background:var(--flame); border-color:var(--flame); color:#fff}
+  .dot-lbl{font-size:9px; letter-spacing:.06em; color:var(--muted); text-transform:uppercase}
+
+  .gate{display:flex; gap:11px; align-items:flex-start; margin:4px 12px 14px; padding:12px 14px; background:var(--steel-soft); border:1px solid #C7D6E4; border-radius:11px}
+  .gate.cleared{background:var(--flame-soft); border-color:#EAC7B6}
+  .flag{flex:0 0 auto; margin-top:1px; color:var(--steel)}
+  .gate.cleared .flag{color:var(--flame)}
+  .gate-lbl{font-size:11px; letter-spacing:.12em; text-transform:uppercase; font-weight:700; color:var(--steel); margin-bottom:2px}
+  .gate.cleared .gate-lbl{color:var(--flame)}
+  .gate-text{font-size:13.5px}
+
+  footer{display:flex; justify-content:space-between; align-items:center; margin-top:22px; gap:12px; flex-wrap:wrap}
+  .note{font-size:12px; color:var(--muted); max-width:470px}
+  button.reset{font-family:var(--body); font-size:12.5px; color:var(--muted); background:transparent; border:1px solid var(--line); border-radius:9px; padding:8px 14px; cursor:pointer; -webkit-tap-highlight-color:transparent}
+  button.reset:active{border-color:#B9C2CD; color:var(--ink)}
+
+  @media (prefers-reduced-motion: no-preference){
+    .box,.dot-circle,.stage,li.task{transition:background .15s ease,border-color .15s ease,opacity .15s ease}
+    .rider,.fillpath{transition:all .5s cubic-bezier(.4,0,.2,1)}
+  }
+  :focus-visible{outline:2px solid var(--flame); outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Grade 1 · lateral upper gastrocnemius</p>
+    <h1>Back to the box</h1>
+    <p class="sub">A tolerance-gated recovery log for CrossFit &amp; plyometrics. Advance a stage only when its checkpoint clears — symptoms override the dates.</p>
+    <p class="anchor" id="anchor">Day 1 = Tue, Jul 21 · injury Jul 20</p>
+  </header>
+
+  <div class="ridge-card">
+    <div class="ridge-head">
+      <span class="pct" id="pct">0%</span>
+      <span class="lbl" id="stageLbl">Stage 1 of 5</span>
+    </div>
+    <svg class="ridge" id="ridge" viewBox="0 0 100 42" preserveAspectRatio="none" aria-hidden="true"></svg>
+  </div>
+
+  <div id="stages"></div>
+
+  <footer>
+    <p class="note">Not medical advice — I haven't examined you. Impact and explosive work are the highest re-injury risk here; if you can, get a PT to clear you with hop tests before Stage 4. Sharp pain, a lump or gap, or heavy bruising means see someone.</p>
+    <button class="reset" id="reset">Reset progress</button>
+  </footer>
+</div>
+
+<script>
+const STORE_KEY = 'gastroc_crossfit_v1';   // distinct from the trail tracker (same GitHub Pages origin)
+
+const PHASES = [
+  {
+    id:'p1', window:'Days 1–3', dates:'Jul 21 – 23', title:'Protect & calm it down',
+    intent:'Gentle movement, no real loading yet. Keep everything pain-free.',
+    habits:[
+      {id:'walk',   text:'Walk only in a pain-free range — shorten your stride if needed'},
+      {id:'pumps',  text:'Ankle pumps: 10–15 reps, 4–5× through the day'},
+      {id:'circles',text:'Ankle circles: slow, both directions'},
+      {id:'elevate',text:'Elevate the leg if it swells (ice optional, for comfort)'},
+    ],
+    tasks:[
+      {id:'heel',    text:'Add a heel lift to both shoes to offload the calf'},
+      {id:'avoid',   text:'Hold the avoid-list: explosive push-off, box jumps, running, deep squats, jump rope'},
+      {id:'hyperice',text:'Hyperice only on surrounding calf / quad / foot — keep it off the strain itself'},
+    ],
+    gate:'Walking is completely pain-free before you progress.'
+  },
+  {
+    id:'p2', window:'≈ Days 3–10', dates:'Jul 23 – 30', title:'Restore load tolerance',
+    intent:'Begin loading once walking is pain-free. Keep training around it — upper body, seated/machine, and no-impact work stay fair game.',
+    tasks:[
+      {id:'iso',    text:'Isometric calf holds: rise slightly on both toes, hold 20–30s × 4–5'},
+      {id:'dlraise',text:'Double-leg calf raises — build toward 3 × 15'},
+      {id:'shift',  text:'Once that\u2019s easy, shift more weight onto the injured side'},
+      {id:'stretch',text:'Gentle calf stretch (wall/step) — mild, only after raises feel fine'},
+      {id:'bike',   text:'Bike / row (no explosive drive) or flat walking for blood flow'},
+    ],
+    gate:'3 × 15 pain-free double-leg calf raises.'
+  },
+  {
+    id:'p3', window:'≈ Weeks 2–3', dates:'Jul 28 – Aug 10', title:'Strength & squat depth',
+    intent:'Build the single-leg strength and full-depth squat the barbell work will demand.',
+    tasks:[
+      {id:'slstraight',text:'Single-leg calf raises, straight knee (gastroc) — build to 3 × 12–15'},
+      {id:'slbent',    text:'Single-leg calf raises, bent knee (soleus)'},
+      {id:'ecc',       text:'Heavy slow eccentrics: lower under load over 3–4s'},
+      {id:'stepdown',  text:'Controlled step-downs'},
+      {id:'depth',     text:'Rebuild squat depth: bodyweight → goblet, full depth, pain-free'},
+    ],
+    gate:'Single-leg raises match your good side + full-depth bodyweight squat, pain-free.'
+  },
+  {
+    id:'p4', window:'≈ Weeks 3–5', dates:'Aug 4 – 24', title:'Plyometric & impact reintro',
+    intent:'Reintroduce spring and impact in order. This is the stage that makes you WOD-ready — and the one most likely to re-tweak it if rushed.',
+    tasks:[
+      {id:'pogo',     text:'Pogo hops in place: low, stiff-ankle, double-leg — build amplitude on tolerance'},
+      {id:'single',   text:'Progress to single-leg hops'},
+      {id:'rope',     text:'Jump rope: single-unders first, then build toward double-unders'},
+      {id:'box',      text:'Low box jumps — step DOWN off the box, never jump down (landing is the risk)'},
+      {id:'run',      text:'Return to run: walk/jog intervals building to easy continuous running'},
+      {id:'loaddepth',text:'Loaded squat depth: front squat / clean at moderate weight'},
+    ],
+    gate:'Pain-free short set of double-unders + easy run + moderate box jumps.'
+  },
+  {
+    id:'p5', window:'≈ Weeks 4–6', dates:'Aug 11 – 31', title:'Return to the WOD',
+    intent:'Return under fatigue and volume — the calf fails when it\u2019s tired, so cap the impact movements first and build them back one at a time.',
+    tasks:[
+      {id:'scale', text:'Scale into metcons — cap reps of double-unders, box jumps, running, wall balls at first'},
+      {id:'lifts', text:'Reintroduce heavy / explosive lifts: cleans, snatches, squats to depth'},
+      {id:'volume',text:'Add volume progressively: metcon length and impact reps, one variable at a time'},
+      {id:'full',  text:'Full-effort WOD with unscaled double-unders, box jumps, running, heavy oly last'},
+    ],
+    gate:'Full-intensity WOD — unscaled impact + heavy lifting — pain-free the next day. Summit.'
+  }
+];
+
+let state = { checks:{}, dots:{} };
+
+function load(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw){ const p = JSON.parse(raw); state.checks = p.checks||{}; state.dots = p.dots||{}; }
+  }catch(e){ /* storage unavailable — runs in-session only */ }
+}
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+
+const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.2 4.2L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+function phaseUnits(p){
+  let total = (p.tasks?p.tasks.length:0) + (p.habits?p.habits.length*3:0);
+  let done = 0;
+  if(p.tasks) p.tasks.forEach(t=>{ if(state.checks[t.id]) done++; });
+  if(p.habits) p.habits.forEach(h=>{ const d=state.dots[h.id]||[]; done += d.filter(Boolean).length; });
+  return {total, done};
+}
+function phaseCleared(p){ const {total,done}=phaseUnits(p); return total>0 && done===total; }
+
+function render(){
+  const host = document.getElementById('stages');
+  host.innerHTML = '';
+  PHASES.forEach((p, i)=>{
+    const {total,done} = phaseUnits(p);
+    const cleared = phaseCleared(p);
+    const stage = document.createElement('div');
+    stage.className = 'stage' + (cleared?' done':'');
+
+    const cal = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+    let html = `
+      <div class="stage-top">
+        <div class="marker">${cleared?'\u2713':(i+1)}</div>
+        <div class="stage-head">
+          <div class="stage-window">Stage ${i+1} · ${p.window}</div>
+          <div class="stage-title">${p.title}</div>
+          <span class="date-badge">${cal}${p.dates}</span>
+          <p class="stage-intent">${p.intent}</p>
+        </div>
+        <div class="stage-count">${done}/${total}</div>
+      </div>`;
+
+    if(p.habits){
+      html += `<div class="group-label">Do daily · tap a day as you finish it</div><ul>`;
+      p.habits.forEach(h=>{
+        const d = state.dots[h.id] || [false,false,false];
+        html += `<li class="habit"><span class="habit-text">${h.text}</span><span class="dots">`;
+        for(let k=0;k<3;k++){
+          html += `<span class="dot ${d[k]?'on':''}" data-habit="${h.id}" data-idx="${k}" role="checkbox" aria-checked="${d[k]}" tabindex="0">
+                     <span class="dot-circle">${d[k]?'\u2713':''}</span><span class="dot-lbl">D${k+1}</span></span>`;
+        }
+        html += `</span></li>`;
+      });
+      html += `</ul>`;
+    }
+
+    if(p.tasks){
+      if(p.habits) html += `<div class="group-label">Set up & rules</div>`;
+      html += `<ul>`;
+      p.tasks.forEach(t=>{
+        const on = !!state.checks[t.id];
+        html += `<li class="task ${on?'checked':''}" data-check="${t.id}" role="checkbox" aria-checked="${on}" tabindex="0">
+                   <span class="box">${CHECK_SVG}</span><span class="task-text">${t.text}</span></li>`;
+      });
+      html += `</ul>`;
+    }
+
+    html += `
+      <div class="gate ${cleared?'cleared':''}">
+        <span class="flag"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 21V4m0 0h11l-2 3 2 3H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div>
+          <div class="gate-lbl">${cleared?'Checkpoint cleared':'Checkpoint to advance'}</div>
+          <div class="gate-text">${p.gate}</div>
+        </div>
+      </div>`;
+
+    stage.innerHTML = html;
+    host.appendChild(stage);
+  });
+  wire();
+  updateRidge();
+}
+
+function wire(){
+  document.querySelectorAll('[data-check]').forEach(el=>{
+    const fn = ()=>{ const id=el.dataset.check; state.checks[id]=!state.checks[id]; save(); render(); };
+    el.onclick = fn;
+    el.onkeydown = e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); fn(); } };
+  });
+  document.querySelectorAll('.dot').forEach(el=>{
+    const fn = ()=>{
+      const id=el.dataset.habit, k=+el.dataset.idx;
+      const d = state.dots[id] || [false,false,false];
+      d[k] = !d[k]; state.dots[id]=d; save(); render();
+    };
+    el.onclick = fn;
+    el.onkeydown = e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); fn(); } };
+  });
+}
+
+/* signature: a plyometric bounce trajectory whose bounces climb as you progress */
+const TRAJ = (()=>{ const a=[]; for(let x=0;x<=100;x+=2){ const amp=6+(x/100)*30; const y=38-amp*Math.pow(Math.sin(Math.PI*x/16),2); a.push([x,+y.toFixed(2)]); } return a; })();
+function trajY(x){
+  for(let i=0;i<TRAJ.length-1;i++){
+    const [x0,y0]=TRAJ[i], [x1,y1]=TRAJ[i+1];
+    if(x>=x0 && x<=x1){ const t=(x-x0)/(x1-x0); return y0+(y1-y0)*t; }
+  }
+  return TRAJ[TRAJ.length-1][1];
+}
+function overallProgress(){ let t=0,d=0; PHASES.forEach(p=>{ const u=phaseUnits(p); t+=u.total; d+=u.done; }); return t? d/t : 0; }
+function currentStage(){ for(let i=0;i<PHASES.length;i++){ if(!phaseCleared(PHASES[i])) return i+1; } return PHASES.length; }
+
+function updateRidge(){
+  const svg = document.getElementById('ridge');
+  const p = overallProgress();
+  document.getElementById('pct').textContent = Math.round(p*100)+'%';
+  const done = PHASES.filter(phaseCleared).length;
+  document.getElementById('stageLbl').textContent = done===PHASES.length ? 'Summit reached' : ('Stage '+currentStage()+' of '+PHASES.length);
+
+  const line = TRAJ.map(pt=>pt.join(',')).join(' ');
+  const px = p*100, py = trajY(px);
+  let pts = [[0,42]];
+  TRAJ.forEach(pt=>{ if(pt[0]<=px) pts.push(pt); });
+  pts.push([px,py],[px,42]);
+  const fillPoly = pts.map(pt=>pt[0].toFixed(2)+','+pt[1].toFixed(2)).join(' ');
+
+  svg.innerHTML = `
+    <defs><linearGradient id="fg" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#F6E1D6"/><stop offset="1" stop-color="#EDA182"/>
+    </linearGradient></defs>
+    <polygon class="fillpath" points="${fillPoly}" fill="url(#fg)" opacity="0.85"/>
+    <polyline points="${line}" fill="none" stroke="#D85A2E" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle class="rider" cx="${px.toFixed(2)}" cy="${py.toFixed(2)}" r="2.7" fill="#35618A" stroke="#fff" stroke-width="1.1"/>`;
+}
+
+document.getElementById('reset').onclick = ()=>{
+  if(!confirm('Clear all checkmarks and start over?')) return;
+  state = {checks:{}, dots:{}}; save(); render();
+};
+
+load(); render();
+</script>
+</body>
+</html>
