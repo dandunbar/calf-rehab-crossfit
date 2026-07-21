@@ -17,8 +17,7 @@ once the checks for that stage are met.
 
 ## Live URL
 
-<!-- replace with the deployed GitHub Pages URL -->
-`TBD — https://<user>.github.io/calf-rehab-crossfit/`
+https://dandunbar.github.io/calf-rehab-crossfit/
 
 ## Notes
 
