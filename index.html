@@ -126,7 +126,7 @@
     <p class="eyebrow">Grade 1 · lateral upper gastrocnemius</p>
     <h1>Back to the box</h1>
     <p class="sub">A tolerance-gated recovery log for CrossFit &amp; plyometrics. Advance a stage only when its checkpoint clears — symptoms override the dates.</p>
-    <p class="anchor" id="anchor">Day 1 = Tue, Jul 21 · injury Jul 20</p>
+    <p class="anchor" id="anchor">Day 1 = Sat, Aug 1 · injury Jul 31</p>
   </header>
 
   <div class="ridge-card">
@@ -171,7 +171,7 @@ const STORE_KEY = 'gastroc_crossfit_v1';   // distinct from the trail tracker (s
 
 const PHASES = [
   {
-    id:'p1', window:'Days 1–3', dates:'Jul 21 – 23', title:'Protect & calm it down',
+    id:'p1', window:'Days 1–3', dates:'Aug 1 – 3', title:'Protect & calm it down',
     intent:'Gentle movement, no real loading yet. Keep everything pain-free.',
     habits:[
       {id:'walk',   text:'Walk only in a pain-free range — shorten your stride if needed'},
@@ -187,9 +187,9 @@ const PHASES = [
     gate:'Walking is completely pain-free before you progress.'
   },
   {
-    id:'p2', window:'≈ Days 3–10', dates:'Jul 23 – 30', title:'Restore load tolerance',
+    id:'p2', window:'≈ Days 3–10', dates:'Aug 3 – 10', title:'Restore load tolerance',
     intent:'Begin loading once walking is pain-free. Keep training around it — upper body, seated/machine, and no-impact work stay fair game.',
-    tasks:[
+    habits:[
       {id:'iso',    text:'Isometric calf holds: rise slightly on both toes, hold 20–30s × 4–5'},
       {id:'dlraise',text:'Double-leg calf raises — build toward 3 × 15'},
       {id:'shift',  text:'Once that\u2019s easy, shift more weight onto the injured side'},
@@ -199,9 +199,9 @@ const PHASES = [
     gate:'3 × 15 pain-free double-leg calf raises.'
   },
   {
-    id:'p3', window:'≈ Weeks 2–3', dates:'Jul 28 – Aug 10', title:'Strength & squat depth',
+    id:'p3', window:'≈ Weeks 2–3', dates:'Aug 8 – 21', title:'Strength & squat depth',
     intent:'Build the single-leg strength and full-depth squat the barbell work will demand.',
-    tasks:[
+    habits:[
       {id:'slstraight',text:'Single-leg calf raises, straight knee (gastroc) — build to 3 × 12–15'},
       {id:'slbent',    text:'Single-leg calf raises, bent knee (soleus)'},
       {id:'ecc',       text:'Heavy slow eccentrics: lower under load over 3–4s'},
@@ -211,9 +211,9 @@ const PHASES = [
     gate:'Single-leg raises match your good side + full-depth bodyweight squat, pain-free.'
   },
   {
-    id:'p4', window:'≈ Weeks 3–5', dates:'Aug 4 – 24', title:'Plyometric & impact reintro',
+    id:'p4', window:'≈ Weeks 3–5', dates:'Aug 15 – Sep 4', title:'Plyometric & impact reintro',
     intent:'Reintroduce spring and impact in order. This is the stage that makes you WOD-ready — and the one most likely to re-tweak it if rushed.',
-    tasks:[
+    habits:[
       {id:'pogo',     text:'Pogo hops in place: low, stiff-ankle, double-leg — build amplitude on tolerance'},
       {id:'single',   text:'Progress to single-leg hops'},
       {id:'rope',     text:'Jump rope: single-unders first, then build toward double-unders'},
@@ -224,9 +224,9 @@ const PHASES = [
     gate:'Pain-free short set of double-unders + easy run + moderate box jumps.'
   },
   {
-    id:'p5', window:'≈ Weeks 4–6', dates:'Aug 11 – 31', title:'Return to the WOD',
+    id:'p5', window:'≈ Weeks 4–6', dates:'Aug 22 – Sep 11', title:'Return to the WOD',
     intent:'Return under fatigue and volume — the calf fails when it\u2019s tired, so cap the impact movements first and build them back one at a time.',
-    tasks:[
+    habits:[
       {id:'scale', text:'Scale into metcons — cap reps of double-unders, box jumps, running, wall balls at first'},
       {id:'lifts', text:'Reintroduce heavy / explosive lifts: cleans, snatches, squats to depth'},
       {id:'volume',text:'Add volume progressively: metcon length and impact reps, one variable at a time'},
