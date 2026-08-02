@@ -75,9 +75,9 @@
   .task-text{font-size:14.5px; padding-top:1px}
   li.task.checked .task-text{color:var(--muted); text-decoration:line-through; text-decoration-color:#B9C2CD}
 
-  li.habit{display:flex; gap:11px; align-items:center; padding:9px 6px; border-radius:9px; flex-wrap:wrap}
-  .habit-text{font-size:14.5px; flex:1 1 200px; min-width:170px}
-  .dots{display:flex; gap:7px; flex:0 0 auto}
+  li.habit{display:flex; gap:8px; align-items:flex-start; padding:9px 6px; border-radius:9px; flex-wrap:wrap}
+  .habit-text{font-size:14.5px; flex:1 1 100%}
+  .dots{display:flex; gap:8px 7px; flex:1 1 100%; flex-wrap:wrap}
   .dot{display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; -webkit-tap-highlight-color:transparent}
   .dot-circle{width:28px; height:28px; border-radius:50%; border:1.8px solid #B9C2CD; background:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--muted)}
   .dot.on .dot-circle{background:var(--flame); border-color:var(--flame); color:#fff}
@@ -171,7 +171,7 @@ const STORE_KEY = 'gastroc_crossfit_v1';   // distinct from the trail tracker (s
 
 const PHASES = [
   {
-    id:'p1', window:'Days 1–3', dates:'Aug 1 – 3', title:'Protect & calm it down',
+    id:'p1', window:'Days 1–3', dates:'Aug 1 – 3', days:3, title:'Protect & calm it down',
     intent:'Gentle movement, no real loading yet. Keep everything pain-free.',
     habits:[
       {id:'walk',   text:'Walk only in a pain-free range — shorten your stride if needed'},
@@ -187,7 +187,7 @@ const PHASES = [
     gate:'Walking is completely pain-free before you progress.'
   },
   {
-    id:'p2', window:'≈ Days 3–10', dates:'Aug 3 – 10', title:'Restore load tolerance',
+    id:'p2', window:'≈ Days 3–10', dates:'Aug 3 – 10', days:8, title:'Restore load tolerance',
     intent:'Begin loading once walking is pain-free. Keep training around it — upper body, seated/machine, and no-impact work stay fair game.',
     habits:[
       {id:'iso',    text:'Isometric calf holds: rise slightly on both toes, hold 20–30s × 4–5'},
@@ -199,7 +199,7 @@ const PHASES = [
     gate:'3 × 15 pain-free double-leg calf raises.'
   },
   {
-    id:'p3', window:'≈ Weeks 2–3', dates:'Aug 8 – 21', title:'Strength & squat depth',
+    id:'p3', window:'≈ Weeks 2–3', dates:'Aug 8 – 21', days:14, title:'Strength & squat depth',
     intent:'Build the single-leg strength and full-depth squat the barbell work will demand.',
     habits:[
       {id:'slstraight',text:'Single-leg calf raises, straight knee (gastroc) — build to 3 × 12–15'},
@@ -211,7 +211,7 @@ const PHASES = [
     gate:'Single-leg raises match your good side + full-depth bodyweight squat, pain-free.'
   },
   {
-    id:'p4', window:'≈ Weeks 3–5', dates:'Aug 15 – Sep 4', title:'Plyometric & impact reintro',
+    id:'p4', window:'≈ Weeks 3–5', dates:'Aug 15 – Sep 4', days:21, title:'Plyometric & impact reintro',
     intent:'Reintroduce spring and impact in order. This is the stage that makes you WOD-ready — and the one most likely to re-tweak it if rushed.',
     habits:[
       {id:'pogo',     text:'Pogo hops in place: low, stiff-ankle, double-leg — build amplitude on tolerance'},
@@ -224,7 +224,7 @@ const PHASES = [
     gate:'Pain-free short set of double-unders + easy run + moderate box jumps.'
   },
   {
-    id:'p5', window:'≈ Weeks 4–6', dates:'Aug 22 – Sep 11', title:'Return to the WOD',
+    id:'p5', window:'≈ Weeks 4–6', dates:'Aug 22 – Sep 11', days:21, title:'Return to the WOD',
     intent:'Return under fatigue and volume — the calf fails when it\u2019s tired, so cap the impact movements first and build them back one at a time.',
     habits:[
       {id:'scale', text:'Scale into metcons — cap reps of double-unders, box jumps, running, wall balls at first'},
@@ -249,10 +249,10 @@ function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }c
 const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.2 4.2L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 function phaseUnits(p){
-  let total = (p.tasks?p.tasks.length:0) + (p.habits?p.habits.length*3:0);
+  let total = (p.tasks?p.tasks.length:0) + (p.habits?p.habits.length*p.days:0);
   let done = 0;
   if(p.tasks) p.tasks.forEach(t=>{ if(state.checks[t.id]) done++; });
-  if(p.habits) p.habits.forEach(h=>{ const d=state.dots[h.id]||[]; done += d.filter(Boolean).length; });
+  if(p.habits) p.habits.forEach(h=>{ const d=state.dots[h.id]||[]; for(let k=0;k<p.days;k++){ if(d[k]) done++; } });
   return {total, done};
 }
 function phaseCleared(p){ const {total,done}=phaseUnits(p); return total>0 && done===total; }
@@ -283,10 +283,10 @@ function render(){
     if(p.habits){
       html += `<div class="group-label">Do daily · tap a day as you finish it</div><ul>`;
       p.habits.forEach(h=>{
-        const d = state.dots[h.id] || [false,false,false];
+        const d = state.dots[h.id] || [];
         html += `<li class="habit"><span class="habit-text">${h.text}</span><span class="dots">`;
-        for(let k=0;k<3;k++){
-          html += `<span class="dot ${d[k]?'on':''}" data-habit="${h.id}" data-idx="${k}" role="checkbox" aria-checked="${d[k]}" tabindex="0">
+        for(let k=0;k<p.days;k++){
+          html += `<span class="dot ${d[k]?'on':''}" data-habit="${h.id}" data-idx="${k}" role="checkbox" aria-checked="${!!d[k]}" tabindex="0">
                      <span class="dot-circle">${d[k]?'\u2713':''}</span><span class="dot-lbl">D${k+1}</span></span>`;
         }
         html += `</span></li>`;
@@ -331,7 +331,7 @@ function wire(){
   document.querySelectorAll('.dot').forEach(el=>{
     const fn = ()=>{
       const id=el.dataset.habit, k=+el.dataset.idx;
-      const d = state.dots[id] || [false,false,false];
+      const d = state.dots[id] || [];
       d[k] = !d[k]; state.dots[id]=d; save(); render();
     };
     el.onclick = fn;
